@@ -267,12 +267,12 @@
 
 <div class="container">
     <header>
-        <h1>MercadoTech</h1>
+        <h1>KelvenTech</h1>
         <p>Sistema Integrado de Cadastro e Vendas</p>
     </header>
 
     <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('cadastro')">📦 Cadastro (CRUD)</button>
+        <button class="tab-btn active" onclick="switchTab('cadastro')">📦 Cadastro</button>
         <button class="tab-btn" onclick="switchTab('vendas')">🛒 Simular Venda</button>
     </div>
 
@@ -359,7 +359,7 @@
         <h3 style="margin-bottom:15px;">💳 Pagamento Simulado</h3>
         
         <div class="card-preview">
-            <div style="font-size: 12px; letter-spacing: 2px; margin-bottom: 15px;">MERCADOTECH CARD</div>
+            <div style="font-size: 12px; letter-spacing: 2px; margin-bottom: 15px;">CARD</div>
             <div id="view-card-num" style="font-size: 18px; letter-spacing: 3px; margin-bottom: 15px;">•••• •••• •••• ••••</div>
             <div style="display: flex; justify-content: space-between; font-size: 12px;">
                 <span id="view-card-name">NOME DO TITULAR</span>
@@ -369,7 +369,7 @@
 
         <form id="payment-form" onsubmit="processarPagamento(event)">
             <div class="form-group">
-                <label>Número do Cartão (Falso)</label>
+                <label>Número do Cartão</label>
                 <input type="text" id="card-num" maxlength="19" placeholder="4000 1234 5678 9010" required oninput="updateCardView()">
             </div>
             <div class="form-group">
@@ -386,7 +386,7 @@
                     <input type="text" id="card-cvv" placeholder="123" maxlength="3" required>
                 </div>
             </div>
-            <button type="submit" class="btn btn-success">Confirmar Pagamento de Mentira</button>
+            <button type="submit" class="btn btn-success">Confirmar Pagamento</button>
             <button type="button" class="btn btn-danger" style="margin-top:5px;" onclick="fecharPagamento()">Cancelar</button>
         </form>
     </div>
@@ -628,7 +628,7 @@
 
         salvarDados(); // Salva novo estoque no LocalStorage
         
-        alert('🎉 Transação de mentira Aprovada com Sucesso! O estoque foi atualizado.');
+        alert('🎉 Transação Aprovada com Sucesso! O estoque foi atualizado.');
         
         esvaziarCarrinho();
         fecharPagamento();
