@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Produtos & Vendas</title>
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --success-color: #16a34a;
+            --danger-color: #dc2626;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        /* Abas / Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 5px;
+        }
+
+        .tab-btn:hover {
+            background-color: #e2e8f0;
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Layout em duas colunas para o Cadastro */
+        .crud-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 25px;
+        }
+
+        @media (max-width: 768px) {
+            .crud-container, .venda-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+            height: fit-content;
+        }
+
+        .card h2 {
+            margin-bottom: 15px;
+            font-size: 18px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        /* Formulários */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        button.btn {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-primary { background-color: var(--primary-color); color: white; }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+        .btn-success { background-color: var(--success-color); color: white; }
+        .btn-danger { background-color: var(--danger-color); color: white; }
+
+        /* Lista / Tabela de Produtos */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th { background-color: #f1f5f9; font-weight: 600; }
+
+        .prod-img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+            background-color: #e2e8f0;
+        }
+
+        .actions-btns {
+            display: flex;
+            gap: 5px;
+        }
+
+        .actions-btns button {
+            padding: 5px 10px;
+            font-size: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            color: white;
+        }
+
+        /* Tela de Vendas */
+        .venda-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+        }
+
+        .grid-vendas {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .produto-vitrine {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .produto-vitrine img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        /* Modal Cartão de Crédito */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+        }
+
+        /* Design do Cartão Fake */
+        .card-preview {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>MercadoTech</h1>
+        <p>Sistema Integrado de Cadastro e Vendas</p>
+    </header>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('cadastro')">📦 Cadastro (CRUD)</button>
+        <button class="tab-btn" onclick="switchTab('vendas')">🛒 Simular Venda</button>
+    </div>
+
+    <div id="tab-cadastro" class="tab-content active">
+        <div class="crud-container">
+            <div class="card">
+                <h2 id="form-title">Adicionar Produto</h2>
+                <form id="produto-form">
+                    <input type="hidden" id="prod-id">
+                    <div class="form-group">
+                        <label for="prod-nome">Nome do Produto</label>
+                        <input type="text" id="prod-nome" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="prod-desc">Descrição</label>
+                        <textarea id="prod-desc" rows="2" required></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="prod-preco">Preço (R$)</label>
+                            <input type="number" id="prod-preco" step="0.01" min="0" required>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="prod-estoque">Estoque</label>
+                            <input type="number" id="prod-estoque" min="0" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="prod-foto">Foto do Produto</label>
+                        <input type="file" id="prod-foto" accept="image/*">
+                        <input type="hidden" id="prod-foto-base64">
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="btn-salvar">Salvar Produto</button>
+                    <button type="button" class="btn btn-danger" id="btn-cancelar" style="display:none; margin-top:5px;" onclick="resetForm()">Cancelar Edição</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>Produtos Cadastrados</h2>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Foto</th>
+                                <th>Nome</th>
+                                <th>Preço</th>
+                                <th>Estoque</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="produtos-table-body">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-vendas" class="tab-content">
+        <div class="venda-container">
+            <div>
+                <h2 style="margin-bottom: 15px;">Vitrine de Produtos</h2>
+                <div class="grid-vendas" id="vitrine-produtos">
+                    </div>
+            </div>
+
+            <div class="card">
+                <h2>Carrinho</h2>
+                <div id="carrinho-itens">
+                    </div>
+                <div style="margin: 20px 0; font-size: 18px; font-weight: bold; display: flex; justify-content: space-between;">
+                    <span>Total:</span>
+                    <span id="cart-total">R$ 0,00</span>
+                </div>
+                <button class="btn btn-success" onclick="abrirPagamento()">Finalizar Compra (Cartão)</button>
+                <button class="btn btn-danger" style="margin-top: 5px; padding: 5px;" onclick="esvaziarCarrinho()">Limpar Carrinho</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="modal-pagamento">
+    <div class="modal-content">
+        <h3 style="margin-bottom:15px;">💳 Pagamento Simulado</h3>
+        
+        <div class="card-preview">
+            <div style="font-size: 12px; letter-spacing: 2px; margin-bottom: 15px;">MERCADOTECH CARD</div>
+            <div id="view-card-num" style="font-size: 18px; letter-spacing: 3px; margin-bottom: 15px;">•••• •••• •••• ••••</div>
+            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                <span id="view-card-name">NOME DO TITULAR</span>
+                <span id="view-card-val">MM/AA</span>
+            </div>
+        </div>
+
+        <form id="payment-form" onsubmit="processarPagamento(event)">
+            <div class="form-group">
+                <label>Número do Cartão (Falso)</label>
+                <input type="text" id="card-num" maxlength="19" placeholder="4000 1234 5678 9010" required oninput="updateCardView()">
+            </div>
+            <div class="form-group">
+                <label>Nome no Cartão</label>
+                <input type="text" id="card-name" placeholder="Fulano de Tal" required oninput="updateCardView()">
+            </div>
+            <div class="form-row">
+                <div class="form-group" style="flex: 2;">
+                    <label>Validade</label>
+                    <input type="text" id="card-val" placeholder="12/30" maxlength="5" required oninput="updateCardView()">
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>CVV</label>
+                    <input type="text" id="card-cvv" placeholder="123" maxlength="3" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success">Confirmar Pagamento de Mentira</button>
+            <button type="button" class="btn btn-danger" style="margin-top:5px;" onclick="fecharPagamento()">Cancelar</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Estado Global da Aplicação
+    let produtos = JSON.parse(localStorage.getItem('produtos')) || [];
+    let carrinho = [];
+
+    // Conversão de imagem para string Base64 para salvar no LocalStorage
+    document.getElementById('prod-foto').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                document.getElementById('prod-foto-base64').value = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Alternar entre as abas
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        
+        if(tabName === 'cadastro') {
+            document.querySelector('[onclick="switchTab(\'cadastro\')"]').classList.add('active');
+            document.getElementById('tab-cadastro').classList.add('active');
+        } else {
+            document.querySelector('[onclick="switchTab(\'vendas\')"]').classList.add('active');
+            document.getElementById('tab-vendas').classList.add('active');
+            renderVitrine();
+        }
+    }
+
+    // --- SEÇÃO CRUD (PRODUTOS) ---
+
+    const form = document.getElementById('produto-form');
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const id = document.getElementById('prod-id').value;
+        const nome = document.getElementById('prod-nome').value;
+        const descricao = document.getElementById('prod-desc').value;
+        const preco = parseFloat(document.getElementById('prod-preco').value);
+        const estoque = parseInt(document.getElementById('prod-estoque').value);
+        const foto = document.getElementById('prod-foto-base64').value || 'https://via.placeholder.com/150';
+
+        if (id) {
+            // Modo Edição
+            produtos = produtos.map(p => p.id === id ? { id, nome, descricao, preco, estoque, foto } : p);
+        } else {
+            // Modo Criação
+            const novoProduto = {
+                id: Date.now().toString(),
+                nome, descricao, preco, estoque, foto
+            };
+            produtos.push(novoProduto);
+        }
+
+        salvarDados();
+        resetForm();
+        renderTabela();
+    });
+
+    function renderTabela() {
+        const tbody = document.getElementById('produtos-table-body');
+        tbody.innerHTML = '';
+
+        produtos.forEach(p => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><img src="${p.foto}" class="prod-img" alt="${p.nome}"></td>
+                <td><strong>${p.nome}</strong><br><small style="color:#64748b">${p.descricao}</small></td>
+                <td>R$ ${p.preco.toFixed(2)}</td>
+                <td>${p.estoque} un</td>
+                <td class="actions-btns">
+                    <button class="btn-success" onclick="editarProduto('${p.id}')">✏️</button>
+                    <button class="btn-danger" onclick="deletarProduto('${p.id}')">🗑️</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function deletarProduto(id) {
+        if(confirm('Deseja realmente excluir este produto?')) {
+            produtos = produtos.filter(p => p.id !== id);
+            salvarDados();
+            renderTabela();
+        }
+    }
+
+    function editarProduto(id) {
+        const p = produtos.find(p => p.id === id);
+        if(p) {
+            document.getElementById('prod-id').value = p.id;
+            document.getElementById('prod-nome').value = p.nome;
+            document.getElementById('prod-desc').value = p.descricao;
+            document.getElementById('prod-preco').value = p.preco;
+            document.getElementById('prod-estoque').value = p.estoque;
+            document.getElementById('prod-foto-base64').value = p.foto;
+            
+            document.getElementById('form-title').innerText = "Editar Produto";
+            document.getElementById('btn-salvar').innerText = "Atualizar Produto";
+            document.getElementById('btn-cancelar').style.display = "block";
+        }
+    }
+
+    function resetForm() {
+        form.reset();
+        document.getElementById('prod-id').value = '';
+        document.getElementById('prod-foto-base64').value = '';
+        document.getElementById('form-title').innerText = "Adicionar Produto";
+        document.getElementById('btn-salvar').innerText = "Salvar Produto";
+        document.getElementById('btn-cancelar').style.display = "none";
+    }
+
+    function salvarDados() {
+        localStorage.setItem('produtos', JSON.stringify(produtos));
+    }
+
+
+    // --- SEÇÃO VITRINE & VENDAS ---
+
+    function renderVitrine() {
+        const vitrine = document.getElementById('vitrine-produtos');
+        vitrine.innerHTML = '';
+
+        if(produtos.length === 0) {
+            vitrine.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#64748b;">Nenhum produto cadastrado para venda.</p>';
+            return;
+        }
+
+        produtos.forEach(p => {
+            const div = document.createElement('div');
+            div.className = 'produto-vitrine';
+            div.innerHTML = `
+                <img src="${p.foto}" alt="${p.nome}">
+                <h3>${p.nome}</h3>
+                <p style="font-size:12px; color:#64748b; margin: 5px 0;">${p.descricao}</p>
+                <p style="font-weight:bold; color:var(--primary-color)">R$ ${p.preco.toFixed(2)}</p>
+                <p style="font-size:12px; margin-bottom:10px;">Estoque: ${p.estoque}</p>
+                <button class="btn btn-primary" ${p.estoque === 0 ? 'disabled' : ''} onclick="adicionarAoCarrinho('${p.id}')">
+                    ${p.estoque === 0 ? 'Esgotado' : '🛒 Adicionar'}
+                </button>
+            `;
+            vitrine.appendChild(div);
+        });
+    }
+
+    function adicionarAoCarrinho(id) {
+        const produto = produtos.find(p => p.id === id);
+        const itemNoCarrinho = carrinho.find(item => item.id === id);
+
+        // Validar estoque disponível
+        const qtdNoCarrinho = itemNoCarrinho ? itemNoCarrinho.qtd : 0;
+        if (qtdNoCarrinho >= produto.estoque) {
+            alert('Quantidade máxima em estoque atingida para este produto.');
+            return;
+        }
+
+        if (itemNoCarrinho) {
+            itemNoCarrinho.qtd++;
+        } else {
+            carrinho.push({ ...produto, qtd: 1 });
+        }
+
+        renderCarrinho();
+    }
+
+    function renderCarrinho() {
+        const container = document.getElementById('carrinho-itens');
+        container.innerHTML = '';
+        let total = 0;
+
+        carrinho.forEach(item => {
+            total += item.preco * item.qtd;
+            const div = document.createElement('div');
+            div.className = 'cart-item';
+            div.innerHTML = `
+                <div>
+                    <strong>${item.nome}</strong><br>
+                    <small>${item.qtd}x R$ ${item.preco.toFixed(2)}</small>
+                </div>
+                <span style="font-weight:600">R$ ${(item.preco * item.qtd).toFixed(2)}</span>
+            `;
+            container.appendChild(div);
+        });
+
+        document.getElementById('cart-total').innerText = `R$ ${total.toFixed(2)}`;
+    }
+
+    function esvaziarCarrinho() {
+        carrinho = [];
+        renderCarrinho();
+    }
+
+
+    // --- SIMULADOR DE CARTÃO FALSO ---
+
+    function abrirPagamento() {
+        if(carrinho.length === 0) {
+            alert('Seu carrinho está vazio!');
+            return;
+        }
+        document.getElementById('modal-pagamento').style.display = 'flex';
+    }
+
+    function fecharPagamento() {
+        document.getElementById('modal-pagamento').style.display = 'none';
+        document.getElementById('payment-form').reset();
+        updateCardView();
+    }
+
+    // Atualiza a interface gráfica do cartão conforme digita
+    function updateCardView() {
+        const num = document.getElementById('card-num').value;
+        const name = document.getElementById('card-name').value;
+        const val = document.getElementById('card-val').value;
+
+        document.getElementById('view-card-num').innerText = num || '•••• •••• •••• ••••';
+        document.getElementById('view-card-name').innerText = name.toUpperCase() || 'NOME DO TITULAR';
+        document.getElementById('view-card-val').innerText = val || 'MM/AA';
+    }
+
+    function processarPagamento(e) {
+        e.preventDefault();
+
+        // Abate as quantidades vendidas do estoque real dos produtos
+        carrinho.forEach(itemCarrinho => {
+            const produtoReal = produtos.find(p => p.id === itemCarrinho.id);
+            if (produtoReal) {
+                produtoReal.estoque -= itemCarrinho.qtd;
+            }
+        });
+
+        salvarDados(); // Salva novo estoque no LocalStorage
+        
+        alert('🎉 Transação de mentira Aprovada com Sucesso! O estoque foi atualizado.');
+        
+        esvaziarCarrinho();
+        fecharPagamento();
+        switchTab('cadastro'); // Retorna ao CRUD para ver o estoque atualizado
+    }
+
+    // Inicialização da página
+    renderTabela();
+</script>
+</body>
+</html>
